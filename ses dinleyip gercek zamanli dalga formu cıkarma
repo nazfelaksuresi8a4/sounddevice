@@ -1,0 +1,33 @@
+import sounddevice as sd 
+import numpy as np
+import matplotlib.pyplot as plt
+
+fig,ax = plt.subplots(1,1)
+
+channels = 1
+duration = 6
+samplerate = 44100
+global_array = None
+
+def callback(indata,time,status,frames):
+    global global_array
+
+    if status:
+        print()
+
+    global_array = indata
+
+def fcb():
+    print('Callback finished.')
+
+with sd.InputStream(samplerate=44100,
+                    blocksize=512,
+                    channels=1,
+                    callback=callback,
+                    finished_callback=fcb) as e:
+    e.start()
+    while True:
+        if global_array is not None:
+            ax.clear()
+            ax.plot(global_array)
+            plt.pause(0.05)
